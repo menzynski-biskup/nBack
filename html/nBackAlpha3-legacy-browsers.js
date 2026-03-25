@@ -19,9 +19,27 @@ psychoJS.openWindow({
 let expName = 'nBackAlpha3';  // from the Builder filename that created this script
 let expInfo = {'participant': '', 'session': '001', 'group': '', 'time_of_day': ''};
 
+// read URL parameters and pre-fill expInfo; fields provided via URL will be hidden in the dialog
+// (URLSearchParams is polyfilled for legacy browsers via url-search-params.js in index.html)
+const _urlParams = new URLSearchParams(window.location.search);
+const _expVarKeys = ['participant', 'session', 'group', 'time_of_day'];
+_expVarKeys.forEach(function(key) {
+  if (_urlParams.has(key)) {
+    expInfo[key] = _urlParams.get(key);
+  }
+});
+
+// build a dialog dictionary that only contains fields not supplied via URL
+let dialogInfo = {};
+Object.keys(expInfo).forEach(function(key) {
+  if (!_urlParams.has(key)) {
+    dialogInfo[key] = expInfo[key];
+  }
+});
+
 // schedule the experiment:
 psychoJS.schedule(psychoJS.gui.DlgFromDict({
-  dictionary: expInfo,
+  dictionary: dialogInfo,
   title: expName
 }));
 
@@ -78,6 +96,11 @@ psychoJS.start({
 
 var frameDur;
 function updateInfo() {
+  // merge user-entered dialog values (non-URL fields) back into expInfo
+  Object.keys(dialogInfo).forEach(function(key) {
+    expInfo[key] = dialogInfo[key];
+  });
+
   expInfo['date'] = util.MonotonicClock.getDateStr();  // add a simple timestamp
   expInfo['expName'] = expName;
   expInfo['psychopyVersion'] = '2020.1.3';
